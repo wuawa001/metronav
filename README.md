@@ -1,6 +1,15 @@
 # MetroNav
 
-<p align="center"><img src="logo.png" width="200" alt="MetroNav"></p>
+<p align="center"><img src="logo.png" width="180" alt="MetroNav"></p>
+
+<p align="center">
+  <a href="https://github.com/wuawa001/metronav/releases"><img src="https://img.shields.io/github/v/release/wuawa001/metronav?label=Latest&color=00E5FF" alt="Latest release"></a>
+  <a href="https://github.com/wuawa001/metronav/releases"><img src="https://img.shields.io/github/downloads/wuawa001/metronav/total?label=Downloads&color=00E5FF" alt="Downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/wuawa001/metronav?color=00E5FF" alt="License"></a>
+  <img src="https://img.shields.io/badge/Minecraft-1.20.1%20%7C%201.20.4-62B47A" alt="Minecraft">
+  <img src="https://img.shields.io/badge/Loader-Fabric-ffb4b4" alt="Fabric">
+  <img src="https://img.shields.io/badge/Requires-Fabric%20API-ffb4b4" alt="Fabric API">
+</p>
 
 A **client-side Fabric mod** that adds map-based navigation for [MTR (Minecraft Transit Railway)](https://modrinth.com/mod/mtr): click a point on the map, and it automatically plans a combined **metro + walking** route, guiding you with an on-screen HUD and in-world 3D lines.
 
@@ -103,6 +112,8 @@ Requirements: JDK 17, Gradle (fabric-loom 1.9.2).
 - **Blank areas**: Xaero only caches explored/generated chunks; explored areas load automatically.
 - **Brief MTR dashboard flash**: normal while fetching route data (~1 s).
 - **Walking guide is a straight line**: walk around obstacles yourself; the HUD arrow always points at the target.
+
+Full changelog: [CHANGELOG.md](CHANGELOG.md)
 
 ## License
 
