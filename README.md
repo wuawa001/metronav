@@ -1,5 +1,7 @@
 # MetroNav
 
+<p align="center"><img src="logo.png" width="200" alt="MetroNav"></p>
+
 A **client-side Fabric mod** that adds map-based navigation for [MTR (Minecraft Transit Railway)](https://modrinth.com/mod/mtr): click a point on the map, and it automatically plans a combined **metro + walking** route, guiding you with an on-screen HUD and in-world 3D lines.
 
 - **Click-to-navigate**: like a real navigation app — click anywhere on the map to start.
