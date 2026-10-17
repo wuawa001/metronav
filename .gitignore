@@ -1,0 +1,21 @@
+# Gradle / Loom
+.gradle/
+build/
+run/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.ipr
+*.iws
+
+# MTR dependency jars (downloaded separately, not redistributed)
+libs/*.jar
+!libs/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+*.log

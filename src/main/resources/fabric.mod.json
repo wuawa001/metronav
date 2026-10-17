@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "metronav",
+  "version": "${version}",
+  "name": "MetroNav 地铁导航",
+  "description": "适配 MTR（Minecraft Transit Railway）的地图导航模组：世界地图点选导航（缩放/平移）、地铁+步行混合路线规划、HUD 与 3D 指引。按 N 键打开地图。",
+  "authors": ["MetroNav"],
+  "license": "MIT",
+  "icon": "assets/metronav/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.metronav.MetroNavClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=17"
+  },
+  "suggests": {
+    "mtr": ">=4.0.5",
+    "xaeroworldmap": "*"
+  }
+}
