@@ -1,5 +1,7 @@
 # MetroNav 地铁导航
 
+<p align="center"><img src="logo.png" width="200" alt="MetroNav"></p>
+
 一个 **Fabric 客户端模组**，为 [MTR（Minecraft Transit Railway）](https://modrinth.com/mod/mtr) 提供"**地图点选导航**"：
 在地图上点一个点，自动规划 **地铁 + 步行** 混合路线，并在屏幕 HUD 与 3D 世界内给出引导。
 
