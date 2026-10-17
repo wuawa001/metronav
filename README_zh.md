@@ -1,6 +1,15 @@
 # MetroNav 地铁导航
 
-<p align="center"><img src="logo.png" width="200" alt="MetroNav"></p>
+<p align="center"><img src="logo.png" width="180" alt="MetroNav"></p>
+
+<p align="center">
+  <a href="https://github.com/wuawa001/metronav/releases"><img src="https://img.shields.io/github/v/release/wuawa001/metronav?label=最新版&color=00E5FF" alt="Latest release"></a>
+  <a href="https://github.com/wuawa001/metronav/releases"><img src="https://img.shields.io/github/downloads/wuawa001/metronav/total?label=下载量&color=00E5FF" alt="Downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/wuawa001/metronav?color=00E5FF" alt="License"></a>
+  <img src="https://img.shields.io/badge/Minecraft-1.20.1%20%7C%201.20.4-62B47A" alt="Minecraft">
+  <img src="https://img.shields.io/badge/加载器-Fabric-ffb4b4" alt="Fabric">
+  <img src="https://img.shields.io/badge/前置-Fabric%20API-ffb4b4" alt="Fabric API">
+</p>
 
 一个 **Fabric 客户端模组**，为 [MTR（Minecraft Transit Railway）](https://modrinth.com/mod/mtr) 提供"**地图点选导航**"：
 在地图上点一个点，自动规划 **地铁 + 步行** 混合路线，并在屏幕 HUD 与 3D 世界内给出引导。
@@ -104,6 +113,8 @@
 - **地图有空白**：Xaero 未探索区域没有地形数据（Xaero 只缓存走过/生成过的区域）；已探索区域会自动加载。
 - **短暂闪出 MTR 仪表盘**：拉取线路数据的正常现象，约 1 秒自动关闭。
 - **步行指引为直线示意**：遇障碍自行绕行，HUD 箭头始终指向目标。
+
+完整更新日志见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 八、开源许可
 
