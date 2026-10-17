@@ -46,6 +46,8 @@ A **client-side Fabric mod** that adds map-based navigation for [MTR (Minecraft 
 4. (Optional) Install **Xaero WorldMap** for the map backdrop.
 5. Put the jar into `.minecraft/mods/` and join a world.
 
+> 💡 **Tip**: We recommend enabling **version isolation** in your launcher (HMCL / PCL2 / BakaXL, etc.) so each Minecraft version gets its own isolated game directory — this prevents mods, configs and map data from clashing between versions.
+
 ## Usage
 
 ### 1. Open the map
