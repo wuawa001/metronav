@@ -47,6 +47,8 @@
 4. （可选，需要 Xaero 地图底图）安装 **Xaero WorldMap**；
 5. 将 jar 放入 `.minecraft/mods/` 并进入世界。
 
+> 💡 **提示**：建议在启动器（HMCL / PCL2 / BakaXL 等）中开启**版本隔离**，让每个 Minecraft 版本拥有独立的游戏目录，避免不同版本的 mods、配置和地图数据互相冲突。
+
 ## 三、使用方法
 
 ### 1. 打开地图
