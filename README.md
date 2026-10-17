@@ -1,72 +1,73 @@
-# MetroNav 地铁导航
+# MetroNav
 
-一个 **Fabric 客户端模组**，为 [MTR（Minecraft Transit Railway）](https://modrinth.com/mod/mtr) 提供"**地图点选导航**"：
-在地图上点一个点，自动规划 **地铁 + 步行** 混合路线，并在屏幕 HUD 与 3D 世界内给出引导。
+A **client-side Fabric mod** that adds map-based navigation for [MTR (Minecraft Transit Railway)](https://modrinth.com/mod/mtr): click a point on the map, and it automatically plans a combined **metro + walking** route, guiding you with an on-screen HUD and in-world 3D lines.
 
-- **点选即导航**：像真实导航 App 一样，在地图上点一下就开始导航；
-- **地铁 + 步行混合规划**：自动组合"步行 → 地铁 → 步行"的最优路线；
-- **MTR 可选依赖**：没装 MTR 也能纯步行导航；
-- **Xaero 地图底图**：优先读取 Xaero WorldMap 的已探索地图（含单人 `.xwmc` 缓存），否则用内置地形图。
+- **Click-to-navigate**: like a real navigation app — click anywhere on the map to start.
+- **Combined metro + walking routing**: automatically plans "walk → metro → walk".
+- **MTR is optional**: walking navigation works even without MTR.
+- **Xaero map backdrop**: reads your explored Xaero WorldMap (including the singleplayer `.xwmc` cache), with a built-in terrain fallback.
+
+> 中文说明：[README_zh.md](README_zh.md)
 
 ---
 
-## 一、支持版本
+## Supported versions
 
-| 项目 | 版本 |
+| | Version |
 | --- | --- |
 | Minecraft | 1.20.1 / 1.20.4 |
-| 模组加载器 | Fabric（Fabric Loader 0.15+） |
-| 必需前置 | Fabric API（与 MC 版本对应） |
-| 可选模组 | MTR 4.0.5（地铁导航）、Xaero WorldMap（地图底图） |
-| Java | 17 及以上 |
+| Mod loader | Fabric (Fabric Loader 0.15+) |
+| Required | Fabric API (matching MC version) |
+| Optional | MTR 4.0.5 (metro), Xaero WorldMap (map backdrop) |
+| Java | 17+ |
 
-> 按 MC 版本选择 jar：
-> - `metronav-mc1.20.4-<版本>.jar` → Minecraft 1.20.4
-> - `metronav-mc1.20.1-<版本>.jar` → Minecraft 1.20.1
+> Pick the jar by MC version:
+> - `metronav-mc1.20.4-<version>.jar` → Minecraft 1.20.4
+> - `metronav-mc1.20.1-<version>.jar` → Minecraft 1.20.1
 >
-> 本模组是**客户端模组**，放入你自己的 mods 文件夹即可，服务器无需安装。
+> This is a **client-side mod** — drop it into your own `mods` folder; servers do not need it.
 
-## 二、安装
+## Installation
 
-1. 安装对应 MC 版本的 **Fabric Loader**；
-2. 安装 **Fabric API**（版本与 MC 匹配）；
-3. （可选，需要地铁导航）安装 **MTR 4.0.5**；
-4. （可选，需要 Xaero 地图底图）安装 **Xaero WorldMap**；
-5. 将 jar 放入 `.minecraft/mods/` 并进入世界。
+1. Install **Fabric Loader** for your MC version.
+2. Install **Fabric API** (matching MC version).
+3. (Optional) Install **MTR 4.0.5** for metro navigation.
+4. (Optional) Install **Xaero WorldMap** for the map backdrop.
+5. Put the jar into `.minecraft/mods/` and join a world.
 
-## 三、使用方法
+## Usage
 
-### 1. 打开地图
-按 **N 键**（可在 选项 → 按键设置 中修改）。
+### 1. Open the map
+Press **N** (rebindable in Options → Controls).
 
-地图底图自动选择：
-- 装有 Xaero WorldMap 且有地图数据 → 使用 **Xaero 已探索地图**；
-- 否则 → 使用**内置地形图**（高度图采样）。
+The map backdrop is chosen automatically:
+- Xaero WorldMap data available → **Xaero explored map**;
+- otherwise → **built-in terrain** (heightmap sampling).
 
-叠加显示：地铁线路（线路色）、车站标记、你的位置（白点）、目的地（红叉）。
+Overlays: metro lines (line color), stations, your position (white dot), destination (red cross).
 
-### 2. 点选导航
-- **左键点击地图**：立即设为目的地并自动开始导航；
-  - 点车站附近自动吸附车站（走地铁）；
-  - 点普通位置为"步行 → 地铁 → 步行"最优组合或纯步行；
-- **拖拽** = 平移，**滚轮** = 缩放，**右键** = 取消导航；
-- 顶部按钮：清除目的地、车站列表、刷新数据、回到玩家、关闭。
+### 2. Click to navigate
+- **Left-click** the map: set the destination and start navigating.
+  - Clicking near a station snaps to it (metro);
+  - Clicking elsewhere plans "walk → metro → walk" or a pure walk.
+- **Drag** = pan, **scroll** = zoom, **right-click** = cancel.
+- Top buttons: clear destination, station list, refresh, recenter on player, close.
 
-### 3. 跟随导航
-- **左上角 HUD**：当前线路/步行、动作、方向箭头、剩余距离与预计时间；
-- **换乘提示**：下一站就是换乘站时，HUD 额外提示"下一站换乘: X号线"；
-- **快车识别**：线路代码含 `k` 或线路名含"快车"的，自动标注为"快车"；
-- **3D 指引**：步行 = 青色地面指引线 + 小信标；地铁 = 线路色指引线 + 车站光柱；
-- **到站判定**：进入车站占地范围即进入下一步，无需走到轨道/站台中心。
+### 3. Follow the route
+- **HUD (top-left)**: current line / walking, action, direction arrow, remaining distance and ETA.
+- **Transfer hint**: when the next stop is a transfer, the HUD shows "Next transfer: Line X".
+- **Express detection**: lines whose code contains `k` or whose name contains "快车" are labeled as express.
+- **3D guidance**: walking = cyan ground line + small beacons; metro = line-colored line + station pillars.
+- **Arrival**: entering a station's footprint advances to the next step (no need to reach the track).
 
-## 四、没有 MTR 时
+## Without MTR
 
-- 不装 MTR 时**步行导航照常可用**（点地图任意位置即可）；
-- 点击【车站列表】会弹出 MTR 下载页提示（一键打开浏览器）。
+- Walking navigation still works (click anywhere on the map).
+- Clicking "Station list" opens an MTR download prompt.
 
-## 五、配置文件
+## Configuration
 
-`.minecraft/config/metronav.json`：
+`.minecraft/config/metronav.json`:
 
 ```json
 {
@@ -82,28 +83,28 @@
 }
 ```
 
-## 六、从源码构建
+## Building from source
 
-环境：JDK 17、Gradle（已内置 wrapper 配置，使用 fabric-loom 1.9.2）。
+Requirements: JDK 17, Gradle (fabric-loom 1.9.2).
 
-1. 把 MTR 4.0.5 的 jar 放到 `libs/` 目录（`MTR-fabric-4.0.5+1.20.4.jar` 与 `MTR-fabric-4.0.5+1.20.1.jar`）；
-2. 执行构建：
+1. Put MTR 4.0.5 jars in `libs/` (`MTR-fabric-4.0.5+1.20.4.jar` and `MTR-fabric-4.0.5+1.20.1.jar`).
+2. Build:
    ```bash
    gradle build -Pminecraft_version=1.20.4 -Pfabric_api_version=0.97.3+1.20.4 -Pmtr_jar=libs/MTR-fabric-4.0.5+1.20.4.jar
    gradle build -Pminecraft_version=1.20.1 -Pfabric_api_version=0.92.12+1.20.1 -Pmtr_jar=libs/MTR-fabric-4.0.5+1.20.1.jar
    ```
-3. 产物在 `build/libs/` 下。
+3. Output is in `build/libs/`.
 
-## 七、常见问题
+## FAQ
 
-- **线路显示 0**：稍等几秒自动向服务器请求线路；仍为 0 请确认 MTR 为 4.0.5 且服务器确有线路，点【刷新数据】重试。
-- **地图有空白**：Xaero 未探索区域没有地形数据（Xaero 只缓存走过/生成过的区域）；已探索区域会自动加载。
-- **短暂闪出 MTR 仪表盘**：拉取线路数据的正常现象，约 1 秒自动关闭。
-- **步行指引为直线示意**：遇障碍自行绕行，HUD 箭头始终指向目标。
+- **0 lines shown**: wait a few seconds for the route request; ensure MTR is 4.0.5 and the server has routes, then click "Refresh".
+- **Blank areas**: Xaero only caches explored/generated chunks; explored areas load automatically.
+- **Brief MTR dashboard flash**: normal while fetching route data (~1 s).
+- **Walking guide is a straight line**: walk around obstacles yourself; the HUD arrow always points at the target.
 
-## 八、开源许可
+## License
 
-**GNU General Public License v3.0 (GPL-3.0)** —— 详见 [LICENSE](LICENSE)。
+**GNU General Public License v3.0 (GPL-3.0)** — see [LICENSE](LICENSE).
 
-> 本模组的 `region.xaero` 解析部分参考了 GPL-3.0 的 [XaerosMapFormat](https://github.com/DanDucky/XaerosMapFormat) 项目，故整体采用 GPL-3.0。
-> 第三方组件与声明详见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+> The `region.xaero` parser derives from the GPL-3.0 [XaerosMapFormat](https://github.com/DanDucky/XaerosMapFormat) project, hence GPL-3.0.
+> See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for third-party notices.
