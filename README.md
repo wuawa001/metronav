@@ -103,4 +103,7 @@
 
 ## 八、开源许可
 
-MIT License —— 详见 [LICENSE](LICENSE)。
+**GNU General Public License v3.0 (GPL-3.0)** —— 详见 [LICENSE](LICENSE)。
+
+> 本模组的 `region.xaero` 解析部分参考了 GPL-3.0 的 [XaerosMapFormat](https://github.com/DanDucky/XaerosMapFormat) 项目，故整体采用 GPL-3.0。
+> 第三方组件与声明详见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
