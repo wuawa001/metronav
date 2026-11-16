@@ -1,0 +1,8 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+[[mods]]
+modId="metronav"
+version="${version}"
+displayName="MetroNav"
+description="MTR 线网导航：站点/线路检索、混合规划、HUD 指引、自动识别的步行路网。"

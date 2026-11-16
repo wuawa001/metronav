@@ -124,3 +124,10 @@
 
 > 本模组的 `region.xaero` 解析部分参考了 GPL-3.0 的 [XaerosMapFormat](https://github.com/DanDucky/XaerosMapFormat) 项目，故整体采用 GPL-3.0。
 > 第三方组件与声明详见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+
+## Forge 1.20.1 构建
+1. 把 `MTR-forge-4.0.5+1.20.1.jar` 放进根目录的 `libs/`。
+2. 构建：
+   cd forge
+   gradle build
+3. 产物在 `forge/build/libs/`。

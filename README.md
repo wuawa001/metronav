@@ -123,3 +123,10 @@ Full changelog: [CHANGELOG.md](CHANGELOG.md)
 
 > The `region.xaero` parser derives from the GPL-3.0 [XaerosMapFormat](https://github.com/DanDucky/XaerosMapFormat) project, hence GPL-3.0.
 > See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for third-party notices.
+
+# Forge 1.20.1
+1. Put `MTR-forge-4.0.5+1.20.1.jar` in `libs/`.
+2. Build:
+   cd forge
+   gradle build
+3. Output is in `forge/build/libs/`.
