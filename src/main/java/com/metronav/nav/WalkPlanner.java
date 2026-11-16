@@ -35,9 +35,30 @@ public final class WalkPlanner {
         return fallback;
     }
 
-    /** Straight-line walking path with surface-height waypoints every ~12 blocks. */
+    /** 上一次 {@link #path} 有没有用上自动路网（没用到就是直线兜底）。 */
+    private static RoadGraph.Result lastRoad;
+
+    /**
+     * 从 A 到 B 的步行路径：先用自动识别的路网找一条真的能走的路（绕开墙、绕开水），
+     * 找不到就退回直线。两种情况下的点都是「每隔约 12 格 + 终点」。
+     */
     public static List<double[]> path(ClientLevel level, double ax, double ay, double az,
                                       double bx, double by, double bz) {
+        lastRoad = RoadGraph.findPath(level, RoadGraph.Profile.WALK, ax, ay, az, bx, by, bz);
+        if (lastRoad != null) {
+            return lastRoad.points;
+        }
+        return straightPath(level, ax, ay, az, bx, by, bz);
+    }
+
+    /** 上一次 path() 的路网结果；null = 走的直线兜底。 */
+    public static RoadGraph.Result lastRoad() {
+        return lastRoad;
+    }
+
+    /** 两点一线（旧行为），路网算不出来时兜底。 */
+    public static List<double[]> straightPath(ClientLevel level, double ax, double ay, double az,
+                                              double bx, double by, double bz) {
         List<double[]> pts = new ArrayList<>();
         double dx = bx - ax;
         double dz = bz - az;

@@ -317,9 +317,14 @@ public class NavScreen extends Screen {
             g.drawString(this.font, "… 共 " + plan.legs.size() + " 段行程", x0 + 16, y, 0xAAAAAA);
             y += 12;
         }
-        int mins = Math.max(1, (int) Math.ceil(plan.estSeconds / 60.0));
-        g.drawString(this.font, "全程约 " + Math.round(plan.totalDistance) + " 米 · 约 " + mins + " 分钟 · 换乘 "
+        g.drawString(this.font, "全程 " + NavText.distance(plan.totalDistance) + " · 约 "
+                + NavText.duration(plan.estSeconds) + " · 换乘 "
                 + Math.max(0, metroLegCount(plan) - 1) + " 次", x0, y + 4, 0x55FF55);
+        y += 18;
+        // 为什么这样规划：地铁被否掉时说清原因（比只给结果有用得多）
+        if (!plan.decisionNote.isEmpty()) {
+            g.drawString(this.font, plan.decisionNote, x0, y, 0xAAAAAA);
+        }
     }
 
     private int metroLegCount(RoutePlanner.Plan plan) {

@@ -36,4 +36,37 @@ public final class NavText {
         }
         return n;
     }
+
+    /** 车站名补「站」字：MTR 里的名字有「市政府」也有「市政府站」，统一成后者。 */
+    public static String station(String name) {
+        if (name == null || name.isEmpty()) {
+            return "车站";
+        }
+        return name.endsWith("站") ? name : name + "站";
+    }
+
+    /** 距离文案：不到 1 公里用整数米，超过用两位小数公里（避免 HUD 出现 4783 这种数字）。 */
+    public static String distance(double blocks) {
+        if (Double.isNaN(blocks) || blocks < 0) {
+            return "--";
+        }
+        if (blocks >= 1000.0) {
+            return String.format(java.util.Locale.ROOT, "%.2f 公里", blocks / 1000.0);
+        }
+        return Math.round(blocks) + " 米";
+    }
+
+    /** 时长文案：不足 1 分钟按 1 分钟（HUD 上写「约 0 分钟」没有意义）。 */
+    public static String duration(double seconds) {
+        if (Double.isNaN(seconds) || seconds <= 0) {
+            return "不到 1 分钟";
+        }
+        long total = Math.max(0L, Math.round(seconds));
+        long h = total / 3600L;
+        long m = (total % 3600L) / 60L;
+        if (h > 0L) {
+            return m > 0L ? h + " 小时 " + m + " 分钟" : h + " 小时";
+        }
+        return Math.max(1L, m) + " 分钟";
+    }
 }

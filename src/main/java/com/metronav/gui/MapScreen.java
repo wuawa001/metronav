@@ -34,6 +34,10 @@ public class MapScreen extends Screen {
     private String statusText = "";
     private int refreshTimer = 0;
     private int lastRouteCount = -1;
+    /** 分段标点：按点击顺序保存的途经点 {x, y, z} */
+    private final java.util.List<double[]> waypoints = new java.util.ArrayList<>();
+    private boolean segmentMode = false;
+    private RoutePlanner.Plan segmentPlan;
 
     public MapScreen() {
         super(Component.literal("MetroNav 地图导航"));
@@ -80,6 +84,7 @@ public class MapScreen extends Screen {
             }
         });
         x = addTopButton(x, "刷新数据", b -> refreshData());
+        x = addTopButton(x, "分段标点", b -> toggleSegmentMode());
         x = addTopButton(x, "回到玩家", b -> {
             follow = true;
             snapViewToPlayer();
@@ -116,6 +121,8 @@ public class MapScreen extends Screen {
         destPos = null;
         destStationId = null;
         previewPlan = null;
+        waypoints.clear();
+        segmentPlan = null;
         NavigationSession.get().stop();
         statusText = "已清除目的地";
     }
@@ -206,6 +213,8 @@ public class MapScreen extends Screen {
         if (previewPlan != null) {
             drawPlan(g);
         }
+        drawSegmentPlan(g);
+        drawWaypoints(g);
         drawStations(g);
         drawDestination(g);
         drawPlayer(g);
@@ -318,7 +327,11 @@ public class MapScreen extends Screen {
             return true;
         }
         if (button == 1) {
-            clearDestination();
+            if (segmentMode && !waypoints.isEmpty()) {
+                undoWaypoint();
+            } else {
+                clearDestination();
+            }
             return true;
         }
         return false;
@@ -330,7 +343,11 @@ public class MapScreen extends Screen {
             pressed = false;
             double moved = Math.hypot(mx - pressX, my - pressY);
             if (moved < 5) {
-                clickSetDestination(pressX, pressY);
+                if (segmentMode) {
+                    addWaypoint(pressX, pressY);
+                } else {
+                    clickSetDestination(pressX, pressY);
+                }
             }
             return true;
         }
@@ -353,6 +370,22 @@ public class MapScreen extends Screen {
         double minZoom = Math.max(this.width, this.height - TOP) / (double) mapCache.texSize();
         double factor = amount > 0 ? 1.2 : 1 / 1.2;
         zoom = Math.max(minZoom, Math.min(8.0, zoom * factor));
+    }
+
+    /** 把规划结果拼成「12号线:湖畔>学院路>新城北  1号线:大风>石碧>…」，直接显示在地图面板上。 */
+    private String planChain(RoutePlanner.Plan plan) {
+        StringBuilder sb = new StringBuilder();
+        for (RoutePlanner.Leg leg : plan.legs) {
+            sb.append("  ").append(leg.name).append(":");
+            for (int i = 0; i < leg.stationNames.size(); i++) {
+                sb.append(i == 0 ? "" : ">").append(leg.stationNames.get(i));
+            }
+            if (leg.stationNames.isEmpty() && !leg.points.isEmpty()) {
+                double[] e = leg.points.get(leg.points.size() - 1);
+                sb.append("到(").append(Math.round(e[0])).append(",").append(Math.round(e[2])).append(")");
+            }
+        }
+        return sb.toString();
     }
 
     private void clickSetDestination(double mx, double my) {
@@ -395,9 +428,173 @@ public class MapScreen extends Screen {
             NavigationSession.get().startMixed(index, previewPlan);
             int mins = Math.max(1, (int) Math.ceil(previewPlan.estSeconds / 60.0));
             statusText = "已开始导航 → " + (destName != null ? destName : "目标点")
-                    + " · 约 " + mins + " 分钟 · " + Math.round(previewPlan.totalDistance) + "m";
+                    + " · 约 " + mins + " 分钟 · " + Math.round(previewPlan.totalDistance) + "m"
+                    + (previewPlan.decisionNote.isEmpty() ? "" : " · " + previewPlan.decisionNote)
+                    + planChain(previewPlan);
         } else {
             statusText = "无法规划路线";
+        }
+    }
+
+    // ================= 分段标点 =================
+
+    private void toggleSegmentMode() {
+        segmentMode = !segmentMode;
+        if (segmentMode) {
+            statusText = "分段标点：左键依次添加途经点，右键撤销上一点";
+        } else if (waypoints.isEmpty()) {
+            statusText = "分段标点已关闭";
+        } else {
+            statusText = "分段标点已关闭（已保留 " + waypoints.size() + " 个点，右键可清除）";
+        }
+    }
+
+    /** 把屏幕坐标转成世界坐标（吸附最近车站，没有就取地表） */
+    private void addWaypoint(double mx, double my) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null) {
+            return;
+        }
+        double wx = viewCX + (mx - mapCX()) / zoom;
+        double wz = viewCZ + (my - mapCY()) / zoom;
+        RailwayIndex.StationNode snap = index.nearest(wx, mc.player.getY(), wz, 24);
+        double dx;
+        double dy;
+        double dz;
+        String name;
+        if (snap != null) {
+            dx = snap.x;
+            dy = snap.y;
+            dz = snap.z;
+            name = snap.name;
+        } else {
+            dx = wx;
+            dz = wz;
+            dy = WalkPlanner.surfaceY(mc.level, wx, mc.player.getY(), mc.player.getY());
+            name = "自定义点";
+        }
+        double[] last = waypoints.isEmpty() ? new double[]{mc.player.getX(), mc.player.getY(), mc.player.getZ()}
+                : waypoints.get(waypoints.size() - 1);
+        if (Math.hypot(dx - last[0], dz - last[2]) < 3) {
+            statusText = "该点与上一点重合，已忽略";
+            return;
+        }
+        waypoints.add(new double[]{dx, dy, dz});
+        planSegments();
+        statusText = "已添加第 " + waypoints.size() + " 段 → " + name
+                + (segmentPlan != null
+                    ? " · 总里程 " + Math.round(segmentPlan.totalDistance) + "m · 约 "
+                      + Math.max(1, (int) Math.ceil(segmentPlan.estSeconds / 60.0)) + " 分钟"
+                    : " · 路径规划中…");
+    }
+
+    private void undoWaypoint() {
+        if (!waypoints.isEmpty()) {
+            waypoints.remove(waypoints.size() - 1);
+        }
+        if (waypoints.isEmpty()) {
+            segmentPlan = null;
+            statusText = "已清空所有途经点";
+            return;
+        }
+        planSegments();
+        statusText = "已撤销，剩 " + waypoints.size() + " 段";
+    }
+
+    /** 逐段规划：玩家 → 点1 → 点2 → …，把所有腿拼成一个计划 */
+    private void planSegments() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null || waypoints.isEmpty()) {
+            segmentPlan = null;
+            return;
+        }
+        RoutePlanner.Plan combined = new RoutePlanner.Plan();
+        double cx = mc.player.getX();
+        double cy = mc.player.getY();
+        double cz = mc.player.getZ();
+        for (double[] wp : waypoints) {
+            RoutePlanner.Plan seg = RoutePlanner.planMixed(index, mc.level,
+                    cx, cy, cz, wp[0], wp[1], wp[2], MetroNavConfig.get());
+            if (seg == null || seg.legs.isEmpty()) {
+                continue;
+            }
+            combined.legs.addAll(seg.legs);
+            combined.totalDistance += seg.totalDistance;
+            combined.estSeconds += seg.estSeconds;
+            cx = wp[0];
+            cy = wp[1];
+            cz = wp[2];
+        }
+        segmentPlan = combined.legs.isEmpty() ? null : combined;
+        if (segmentPlan != null) {
+            segmentPlan.unreachable = false;
+            int n = waypoints.size();
+            segmentPlan.destinationName = "第 " + n + " 段终点";
+            NavigationSession.get().startMixed(index, segmentPlan);
+        }
+    }
+
+    private void drawSegmentPlan(GuiGraphics g) {
+        if (segmentPlan == null) {
+            return;
+        }
+        for (RoutePlanner.Leg leg : segmentPlan.legs) {
+            int color = leg.isMetro() ? (0xFF000000 | leg.color) : 0xFF00E5FF;
+            int thickness = leg.isMetro() ? 2 : 1;
+            for (int i = 0; i + 1 < leg.points.size(); i++) {
+                double[] a = leg.points.get(i);
+                double[] b = leg.points.get(i + 1);
+                drawWorldLine(g, a[0], a[2], b[0], b[2], color, thickness);
+            }
+        }
+    }
+
+    /** 画途经点：编号圆点 + 点间虚线 */
+    private void drawWaypoints(GuiGraphics g) {
+        if (waypoints.isEmpty()) {
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        double px = mc.player != null ? mc.player.getX() : 0;
+        double pz = mc.player != null ? mc.player.getZ() : 0;
+        double prevX = px;
+        double prevZ = pz;
+        for (int i = 0; i < waypoints.size(); i++) {
+            double[] wp = waypoints.get(i);
+            // 点间虚线
+            drawDashedLine(g, prevX, prevZ, wp[0], wp[2], 0xFFFFC107);
+            prevX = wp[0];
+            prevZ = wp[2];
+            int x = sx(wp[0]);
+            int y = sy(wp[2]);
+            if (x < -20 || y < TOP - 20 || x > this.width + 20 || y > this.height + 20) {
+                continue;
+            }
+            g.fill(x - 4, y - 4, x + 5, y + 5, 0xE6000000);
+            g.fill(x - 3, y - 3, x + 4, y + 4, 0xFFFFC107);
+            String num = String.valueOf(i + 1);
+            g.drawString(this.font, num, x - this.font.width(num) / 2, y - 3, 0xFF000000);
+        }
+    }
+
+    private void drawDashedLine(GuiGraphics g, double ax, double az, double bx, double bz, int color) {
+        double x1 = mapCX() + (ax - viewCX) * zoom;
+        double y1 = mapCY() + (az - viewCZ) * zoom;
+        double x2 = mapCX() + (bx - viewCX) * zoom;
+        double y2 = mapCY() + (bz - viewCZ) * zoom;
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        int steps = (int) Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)));
+        if (steps <= 0) {
+            return;
+        }
+        for (int i = 0; i <= steps; i++) {
+            if (i % 8 > 4) {
+                continue;
+            }
+            int px = (int) Math.round(x1 + dx * i / steps);
+            int py = (int) Math.round(y1 + dy * i / steps);
+            g.fill(px, py, px + 2, py + 2, color);
         }
     }
 }
